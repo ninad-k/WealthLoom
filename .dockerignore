@@ -1,0 +1,19 @@
+# Node
+node_modules
+npm-debug.log
+.next
+.git
+
+# .NET
+bin/
+obj/
+*.sqlite
+*.db
+*.sqlite3
+
+# Env
+.env
+.env.local
+.env.development
+.env.test
+.env.production

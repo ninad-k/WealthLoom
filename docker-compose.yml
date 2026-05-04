@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: LuminaCast.Backend/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Clerk__Authority=${CLERK_AUTHORITY:-https://boss-ostrich-32.clerk.accounts.dev}
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY}
+      - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET}
+      - Storage__ServiceUrl=${STORAGE_SERVICE_URL}
+      - Storage__BucketName=${STORAGE_BUCKET_NAME}
+      - Storage__AccessKey=${STORAGE_ACCESS_KEY}
+      - Storage__SecretKey=${STORAGE_SECRET_KEY}
+    volumes:
+      - backend-data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      - GRPC_BACKEND_URL=${GRPC_BACKEND_URL:-http://backend:5000}
+
+volumes:
+  backend-data:

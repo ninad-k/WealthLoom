@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package corestream.tenant;
+
+// Represents the styling and brand elements of a tenant
+message Brand {
+  string first = 1;
+  string second = 2;
+  string primary_color = 3;
+  string secondary_color = 4;
+}
+
+// Represents a pricing tier for a tenant's academy
+message PricingTier {
+  string name = 1;
+  string price = 2;
+  repeated string features = 3;
+}
+
+// The core configuration for a single tenant (creator)
+message TenantConfig {
+  string id = 1;
+  string name = 2;
+  string company = 3;
+  string description = 4;
+  string custom_domain = 5;
+  string logo_url = 6;
+  Brand brand = 7;
+  repeated PricingTier pricing = 8;
+}
+
+// Request to fetch a tenant by subdomain or custom domain
+message GetTenantRequest {
+  string domain_or_id = 1;
+}
+
+// Response containing the tenant details
+message GetTenantResponse {
+  TenantConfig tenant = 1;
+}
+
+// The gRPC Service definition
+service TenantService {
+  // Public endpoint
+  rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
+  
+  // Secure endpoint (Requires JWT Authentication)
+  rpc GetSecureDashboard (GetSecureDashboardRequest) returns (GetSecureDashboardResponse);
+  
+  // Secure Video Engine (Requires JWT Authentication & Subscription validation)
+  rpc GetSecureVideoUrl (VideoRequest) returns (VideoResponse);
+
+  // Admin / Creator Endpoints (Requires JWT Authentication + Creator Role)
+  rpc GetUploadUrl (GetUploadUrlRequest) returns (GetUploadUrlResponse);
+  rpc CreateCourse (CreateCourseRequest) returns (CreateCourseResponse);
+}
+
+// Request for the secure dashboard
+message GetSecureDashboardRequest {
+  string tenant_id = 1;
+}
+
+// Response containing sensitive user-specific data
+message GetSecureDashboardResponse {
+  string secret_message = 1;
+}
+
+message VideoRequest {
+  int32 video_id = 1;
+}
+
+message VideoResponse {
+  string presigned_url = 1;
+  string title = 2;
+}
+
+message GetUploadUrlRequest {
+  string filename = 1;
+  string content_type = 2;
+}
+
+message GetUploadUrlResponse {
+  string upload_url = 1;
+  string object_key = 2;
+}
+
+message CreateCourseRequest {
+  string title = 1;
+  string description = 2;
+  repeated int32 video_ids = 3;
+}
+
+message CreateCourseResponse {
+  int32 course_id = 1;
+  bool success = 2;
+}

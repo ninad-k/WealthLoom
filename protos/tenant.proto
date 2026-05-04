@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package corestream.tenant;
+
+// Represents the styling and brand elements of a tenant
+message Brand {
+  string first = 1;
+  string second = 2;
+  string primary_color = 3;
+  string secondary_color = 4;
+}
+
+// Represents a pricing tier for a tenant's academy
+message PricingTier {
+  string name = 1;
+  string price = 2;
+  repeated string features = 3;
+}
+
+// The core configuration for a single tenant (creator)
+message TenantConfig {
+  string id = 1;
+  string name = 2;
+  string company = 3;
+  string description = 4;
+  string custom_domain = 5;
+  string logo_url = 6;
+  Brand brand = 7;
+  repeated PricingTier pricing = 8;
+}
+
+// Request to fetch a tenant by subdomain or custom domain
+message GetTenantRequest {
+  string domain_or_id = 1;
+}
+
+// Response containing the tenant details
+message GetTenantResponse {
+  TenantConfig tenant = 1;
+}
+
+// The gRPC Service definition
+service TenantService {
+  rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
+}
